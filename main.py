@@ -45,24 +45,38 @@ def pad(x,y):
     return x,y
 
 def quadratic_multiply(x, y):
-    # this just converts the result from a BinaryNumber to a regular int
-    return _quadratic_multiply(x,y).decimal_val
+  if not isinstance(x, BinaryNumber):
+      x = BinaryNumber(x)
+  if not isinstance(y, BinaryNumber):
+      y = BinaryNumber(y)
+  return _quadratic_multiply(x, y).decimal_val
+
 
 def _quadratic_multiply(x, y):
-    ### TODO
-    pass
-    ###
+  xvec, yvec = x.binary_vec, y.binary_vec
+  xvec, yvec = pad(xvec, yvec) 
+  if len(xvec) <= 1 and len(yvec) <= 1:
+      return BinaryNumber(x.decimal_val * y.decimal_val)
+  x_left, x_right = split_number(xvec)
+  y_left, y_right = split_number(yvec)
+  xL_yL = _quadratic_multiply(x_left, y_left)
+  xL_yR = _quadratic_multiply(x_left, y_right)
+  xR_yL = _quadratic_multiply(x_right, y_left)
+  xR_yR = _quadratic_multiply(x_right, y_right)
+  n = len(xvec)
+  part1 = bit_shift(xL_yL, n)
+  part2 = bit_shift(BinaryNumber(xL_yR.decimal_val + xR_yL.decimal_val), n // 2)  
+  part3 = xR_yR  
+  result = part1.decimal_val + part2.decimal_val + part3.decimal_val
+  return BinaryNumber(result)
 
 
-    
-    
-def test_quadratic_multiply(x, y, f):
-    start = time.time()
-    # multiply two numbers x, y using function f
-    
-    return (time.time() - start)*1000
+def test_quadratic_multiply(x, y):
+  start = time.time()
+  result = quadratic_multiply(x, y)
+  end = time.time()
+  print(f"Multiplying {x} and {y} results in {result} and took {(end - start) * 1000} milliseconds.")
+  return result
 
 
-    
-    
 
